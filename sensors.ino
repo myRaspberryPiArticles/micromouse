@@ -41,7 +41,7 @@ void updateSensors() {
   f_unlit = analogRead(S_FRONT);
 
   digitalWrite(E_FRONT, HIGH);
-  delayMicroseconds(75);
+  delayMicroseconds(50);
   
   frontSensorValue = max(0, (int)analogRead(S_FRONT) - f_unlit);
   
