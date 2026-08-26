@@ -22,7 +22,7 @@ void setMotors(int motor) {
   int MAX_SPEED = 255;
 
   int absMotor = abs(motor);
-  
+
   // IF positive number, Set the forward speeds to max, and the reverse speed to max - target
   // IF negative number, Set the backward speeds to max, and the forward speed to max - target
 
@@ -35,7 +35,6 @@ void setMotors(int motor) {
     analogWrite(M_BACKWARD, MAX_SPEED);
   }
 
-  
 }
 
 void stop() {

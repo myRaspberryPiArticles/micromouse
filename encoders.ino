@@ -46,7 +46,20 @@ void one_cell_forward() {
   encoderValue = 0;
   while (encoderValue < PULSES_PER_MM) {
     setMotors(255);
-    Serial1.println(encoderValue);
+   // Serial1.println(encoderValue);
   }
+}
+
+void backup() {
+  encoderValue = 0;
+  setMotors(-255);
+  delay(100);
+  encoderValue = 0;
+  stop();
+  while (encoderValue < 3169) {
+    setMotors(255);
+   // Serial1.println(encoderValue);
+  }
+  
   stop();
 }

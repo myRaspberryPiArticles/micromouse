@@ -1,19 +1,16 @@
 
 // --- GLOBAL VARIABLES ---
 
+// CALIBRATION
+
+const uint8_t LEFT_THRESHOLD = 75;
+const uint8_t FRONT_THRESHOLD = 17;
+const uint8_t RIGHT_THRESHOLD = 75;
+
 // Sensor values
 volatile int leftSensorValue = 0;
 volatile int frontSensorValue = 0;
 volatile int rightSensorValue = 0;
-
-int leftSensor[10];
-int frontSensor[10];
-int rightSensor[10];
-
-// Wall thresholds
-const int LEFT_GAP = 10;
-const int FRONT_WALL = 22; //30
-const int RIGHT_GAP = 10;
 
 // Encoder values
 volatile long encoderValue = 0;
@@ -78,7 +75,7 @@ void setup() {
 
 
 void loop() {
-    printSensors();
+    //printSensors();
     //test_left();
     //test_right();
     //setMotors(255);
@@ -86,7 +83,8 @@ void loop() {
     //updateMpu();
     //buttons();
     //one_cell_forward();
-    //runFinal();
+    runFinal();
+    //backup();
 };
 
 // -- SECOND CORE (USED FOR SENSORS & MPU) --

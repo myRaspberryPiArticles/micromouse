@@ -7,11 +7,11 @@
 //from back of cell the readings are as follows:
 
 //right no wall is roughly 45 - 55
-//front no wall is roughly 0 - 8
+//front no wall is roughly 100 - 120
 //left no wall is roughly 30 - 40
 
 //right wall is roughly 95 - 110 (threshold 75)
-//front wall is roughly 4 - 10 (threshold ?)
+//front wall is roughly 150 - 190 (threshold 140)
 //left wall is roughly 90 - 100 (threshold 75)
 
 
@@ -41,7 +41,7 @@ void updateSensors() {
   f_unlit = analogRead(S_FRONT);
 
   digitalWrite(E_FRONT, HIGH);
-  delayMicroseconds(50);
+  delayMicroseconds(75);
   
   frontSensorValue = max(0, (int)analogRead(S_FRONT) - f_unlit);
   
