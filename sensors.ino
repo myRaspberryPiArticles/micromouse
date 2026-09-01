@@ -47,6 +47,8 @@ void updateSensors() {
   
   digitalWrite(E_FRONT, LOW);
 
+  delayMicroseconds(75); 
+
   // --- 1. READ SIDE SENSORS ---
   l_unlit = analogRead(S_LEFT);
   r_unlit = analogRead(S_RIGHT);

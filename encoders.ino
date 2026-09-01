@@ -10,7 +10,7 @@
 #define ENCODER_A 22
 #define ENCODER_B 5
 
-#define PULSES_PER_MM 21025
+const uint16_t PULSES_PER_MM = 18230;
 
 void initEncoders() {
   // Set pin mode
@@ -45,6 +45,14 @@ void encoderISR_B() {
 void one_cell_forward() {
   encoderValue = 0;
   while (encoderValue < PULSES_PER_MM) {
+    setMotors(255);
+   // Serial1.println(encoderValue);
+  }
+}
+
+void half_cell_forward() {
+  encoderValue = 0;
+  while (encoderValue < (PULSES_PER_MM/2)) {
     setMotors(255);
    // Serial1.println(encoderValue);
   }

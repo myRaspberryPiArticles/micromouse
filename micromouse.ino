@@ -4,7 +4,7 @@
 // CALIBRATION
 
 const uint8_t LEFT_THRESHOLD = 75;
-const uint8_t FRONT_THRESHOLD = 17;
+const uint8_t FRONT_THRESHOLD = 11;
 const uint8_t RIGHT_THRESHOLD = 75;
 
 // Sensor values

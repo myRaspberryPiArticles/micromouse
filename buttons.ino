@@ -36,7 +36,7 @@ void buttons() {
   if (button3State == LOW) {
     delay(200); // Simple debounce delay to prevent text flooding
     one_cell_forward();
-    delay(3000); // Simple debounce delay to prevent text flooding
+    delay(300); // Simple debounce delay to prevent text flooding
     stop();
   } else {
     // Optional: Uncomment the line below if you want to see the idle state

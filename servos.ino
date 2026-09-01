@@ -11,8 +11,8 @@ void setup_servo() {
   actuator2.attach(3);
   servo.attach(2, 500, 2500);
   //resetHeadingVariable(); // Reset heading to 0.0
-  actuator.write(50);  // Note: 180 is the true physical maximum for standard servos
-  actuator2.write(50); 
+  actuator.write(20);  // Note: 180 is the true physical maximum for standard servos
+  actuator2.write(20); 
   servo.write(90);      // Snap back to straight center
 
 }
@@ -32,7 +32,7 @@ void test_left() {
   //  updateMpu(); 
   int i;  
   //  right_value -= 1;          // 2. Decrementing turns the servo the opposite way
-  for (i=1; i<=83; i++) {
+  for (i=1; i<=85; i++) {
     servo.write(left_value);
     left_value += 1;
     delay(10);
@@ -40,8 +40,8 @@ void test_left() {
   
   //}
   // Cleanup code
-  actuator.write(50);  
-  actuator2.write(50); 
+  actuator.write(20);  
+  actuator2.write(20); 
   delay(300);
   servo.write(90);      // Snap back to straight center
   delay(300);
@@ -64,15 +64,15 @@ void test_right() {
   //  updateMpu(); 
   int i;  
   //  right_value -= 1;          // 2. Decrementing turns the servo the opposite way
-  for (i=1; i<=80; i++) {
+  for (i=1; i<=81; i++) {
     servo.write(right_value);
     right_value -= 1;
     delay(10);
   }
   //}
   // Cleanup code
-  actuator.write(50);  
-  actuator2.write(50); 
+  actuator.write(20);  
+  actuator2.write(20); 
   delay(300);
   servo.write(90);      // Snap back to straight center
   delay(300);

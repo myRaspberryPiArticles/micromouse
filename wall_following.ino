@@ -6,57 +6,78 @@
 
 //right wall is roughly 95 - 110 (threshold 75)
 //front wall is roughly 150 - 190 (threshold 140)
-//left wall is roughly 90 - 100 (threshold 75)
+//left wall is roughly 90 - 100 (threshold 75) 
 
-void initFinal() {
+uint8_t leftSensorValueNEW = 0;
+uint8_t frontSensorValueNEW = 0;
+uint8_t rightSensorValueNEW = 0;
   
-}
-
 //uint8_t turn_counts = 0;
 
 void runFinal() {
-  // gap on left, so turn left
-  Serial.print("LEFT SENSOR IS AT ");
-  Serial.print(leftSensorValue);
-  Serial.print(" , threshold is 50, descision: ");
-  bool hmm = leftSensorValue < 50;
-  Serial.print(hmm);
-  Serial.println();
+  // go half a cell forward
+  half_cell_forward();
+
+  // stop at the sensing point & take the value of left
+  stop();
+  delay(100);
+  int uleftSensorValueNEW = leftSensorValue;
+
+  half_cell_forward(); // go to middle of next cell
+
+  // check if the value at the snesing point says there's a gap
+  if (leftSensorValueNEW < LEFT_THRESHOLD) {
+    // gap on left, so turn left
+    Serial1.print("LEFT SENSOR IS AT ");
+    Serial1.print(leftSensorValue);
+    Serial1.print(" , threshold is ??, descision: ");
+    bool hmm = leftSensorValue < LEFT_THRESHOLD;
+    Serial1.print(hmm);
+    Serial1.println();
   
-  if (leftSensorValue < 50) {
-    printSensors();
     Serial1.println("gap on left");
+    stop();
+    delay(100);
+  
     test_left();
-    printSensors();
-    delay(100);
+    
+    delay(200);
     one_cell_forward();
-    delay(100);
+    delay(200);
     printSensors();
   }
     
   // wall in front, so turn right
    else if (frontSensorValue >= FRONT_THRESHOLD) {
+    
+    delay(200);
+    stop();
+    delay(200);
+    
     printSensors();
     Serial1.println("wall in front");
     test_right();
-    delay(100);
+    delay(200);
     printSensors();
     //turn_counts += 1;
+   }
 
+  else { // go to middle of the next cell because it's the way to go
+    Serial1.println("going forward");
+    one_cell_forward();
+    delay(200);
+    printSensors();
+  }
+  
+
+  
     /*if (turn_counts == 2) {
       backup();
       turn_counts = 0;
     }*/
-   }
+   // }
 
-  // else go forward
-  else {
-    Serial1.println("going forward");
-    one_cell_forward();
-    delay(100);
-    printSensors();
-  }
-
-  delay(500);
-     
+  delay(200);
+  stop();
+  delay(200);
 }
