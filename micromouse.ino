@@ -36,11 +36,6 @@ const int BUTTON_3_PIN = 8;
 #define DEBUG_MINIMAL 1
 #define DEBUG_FULL 2
 
-// motor pins
-#define M_FORWARD   16
-#define M_BACKWARD   17
-#define SLP    20
-
 // Positioning variables
 int robotX = 0;
 int robotY = 0;
@@ -83,8 +78,8 @@ void loop() {
     //updateMpu();
     //buttons();
     //one_cell_forward();
-    runFinal();
-    //backup();
+    //runFinal();
+    backup();
 };
 
 // -- SECOND CORE (USED FOR SENSORS & MPU) --
