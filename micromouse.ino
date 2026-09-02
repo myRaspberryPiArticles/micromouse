@@ -1,93 +1,64 @@
+// ============================================================
+//  Micromouse — main sketch (Raspberry Pi Pico, dual-core)
+//    Core 0 (setup/loop)   : motors, servos, maze logic, serial
+//    Core 1 (setup1/loop1) : sensor + MPU updates
+// ============================================================
 
-// --- GLOBAL VARIABLES ---
-
-// CALIBRATION
-
-const uint8_t LEFT_THRESHOLD = 75;
+// --- Wall-detection thresholds (raw sensor ranges: see sensors.ino) ---
+const uint8_t LEFT_THRESHOLD  = 75;
 const uint8_t FRONT_THRESHOLD = 11;
 const uint8_t RIGHT_THRESHOLD = 75;
 
-// Sensor values
-volatile int leftSensorValue = 0;
+// --- Live sensor readings (updated on core 1 by updateSensors()) ---
+volatile int leftSensorValue  = 0;
 volatile int frontSensorValue = 0;
 volatile int rightSensorValue = 0;
 
-// Encoder values
+// --- Wheel encoder pulse count (updated by ISRs in encoders.ino) ---
 volatile long encoderValue = 0;
-volatile int encoderDifference = 0; // right - left
 
-// MPU values
-volatile float heading = 0.0; // for turns
-volatile float globalHeading = 0.0; // for debugging
+// --- Gyro headings (updated by updateMpu() in gyro.ino) ---
+volatile float heading        = 0.0; // re-zeroed for each turn
+volatile float globalHeading = 0.0; // never reset (debugging only)
 
-// PD controller values
-const float SENSOR_KP = 1.0; // 2.0
-const float SENSOR_KD = 0.8; // 0.5
-int LEFT_TARGET = 28; //24
-int RIGHT_TARGET = 32; //29
-
-// Button variables         (9 is changed to reset)
-const int BUTTON_PIN = 21;
+// --- Button pins (used by buttons.ino) ---
+const int BUTTON_PIN   = 21;
 const int BUTTON_2_PIN = 10;
 const int BUTTON_3_PIN = 8;
 
-// Debug levels
-#define DEBUG_NONE 0
-#define DEBUG_MINIMAL 1
-#define DEBUG_FULL 2
-
-// Motor Pins
-#define M_FORWARD   16
-#define M_BACKWARD   17
-#define SLP    20
-
-
-// Positioning variables
-int robotX = 0;
-int robotY = 0;
-int robotDir = 0;
-
-int mode; // 0 unconfigured 1 print sensors 2 test distance 3 test angle 4 wall follow 5 hardcoded 6 test MPU 7 solve maze
-
-// --- SETUP ---
 void setup() {
-
-  // Setup BLE Serial
   Serial1.begin(9600);
   initButtons();
+
   Serial1.println("starting initMpu");
   initMpu();
   Serial1.println("initMpu is done!");
   resetHeading();
 
-  // Initialize components
   setup_servo();
   initMotors();
   initEncoders();
 
   delay(2000);
 
-  // get config details
   Serial1.println("------mouse 2026.5.1------");
   Serial1.println();
-
 }
 
-
 void loop() {
-    //printSensors();
-    //test_left();
-    //test_right();
-    //setMotors(255);
-    //Serial1.println(encoderValue);
-    //updateMpu();
-    //buttons();
-    //one_cell_forward();
-    runFinal();
-    //backup();
-};
+  //printSensors();
+  //test_left();
+  //test_right();
+  //setMotors(255);
+  //Serial1.println(encoderValue);
+  //updateMpu();
+  //buttons();
+  //one_cell_forward();
+  runFinal();
+  //backup();
+}
 
-// -- SECOND CORE (USED FOR SENSORS & MPU) --
+// --- Core 1: sensors & MPU ---
 
 void setup1() {
   initSensors();
@@ -95,4 +66,4 @@ void setup1() {
 
 void loop1() {
   updateSensors();
-};
+}

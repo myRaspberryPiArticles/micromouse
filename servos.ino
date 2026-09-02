@@ -1,79 +1,53 @@
+// ============================================================
+//  Steering servo + two actuators
+//    setup_servo() — attach everything and park at home
+//    test_left()   — fire actuators, sweep steering left, reset
+//    test_right()  — fire actuators, sweep steering right, reset
+// ============================================================
+
 #include <Servo.h>
 
-// Using GPIO 2 (J5 - Standard Servo)
-Servo actuator;
-Servo actuator2;
-Servo servo;
+Servo actuator;   // GPIO 4
+Servo actuator2;  // GPIO 3
+Servo servo;      // GPIO 2 (J5 — standard servo)
 
+const int ACTUATOR_HOME = 20;
+const int ACTUATOR_FIRE = 190;  // deliberately past the usual 180 limit
+const int STEERING_HOME = 90;
 
 void setup_servo() {
   actuator.attach(4);
   actuator2.attach(3);
   servo.attach(2, 500, 2500);
-  //resetHeadingVariable(); // Reset heading to 0.0
-  actuator.write(20);  // Note: 180 is the true physical maximum for standard servos
-  actuator2.write(20); 
-  servo.write(90);      // Snap back to straight center
 
+  actuator.write(ACTUATOR_HOME);
+  actuator2.write(ACTUATOR_HOME);
+  servo.write(STEERING_HOME);
 }
 
-void test_left() {
-  int left_value = 30;   // Start at center home position (95)
-  //resetHeadingVariable();*/ // Reset heading to 0.0
-  servo.write(left_value);  
-  delay(500);
-  actuator.write(190); 
-  actuator2.write(190); 
+// Point at `startValue`, fire the actuators, sweep the steering servo
+// `steps` times by `step` per move (10 ms per move), then reset.
+void turnSteering(int startValue, int step, int steps) {
+  servo.write(startValue);
   delay(500);
 
-  // 1. REVERSED DIRECTION: 
-  // Loop while heading is GREATER than -83.3, and decrement right_value down toward 5
-  //while (heading >= -90 && right_value > 5) { 
-  //  updateMpu(); 
-  int i;  
-  //  right_value -= 1;          // 2. Decrementing turns the servo the opposite way
-  for (i=1; i<=85; i++) {
-    servo.write(left_value);
-    left_value += 1;
+  actuator.write(ACTUATOR_FIRE);
+  actuator2.write(ACTUATOR_FIRE);
+  delay(500);
+
+  int value = startValue;
+  for (int i = 0; i < steps; i++) {
+    servo.write(value);
+    value += step;
     delay(10);
   }
-  
-  //}
-  // Cleanup code
-  actuator.write(20);  
-  actuator2.write(20); 
+
+  actuator.write(ACTUATOR_HOME);
+  actuator2.write(ACTUATOR_HOME);
   delay(300);
-  servo.write(90);      // Snap back to straight center
+  servo.write(STEERING_HOME);
   delay(300);
 }
 
-//_____________________________\\
-
-void test_right() {
-  int right_value = 150;   // Start at center home position (95)
-  //resetHeadingVariable(); // Reset heading to 0.0
-  servo.write(right_value);  
-  delay(500);
-  actuator.write(190); 
-  actuator2.write(190); 
-  delay(500);
-
-  // 1. REVERSED DIRECTION: 
-  // Loop while heading is GREATER than -83.3, and decrement right_value down toward 5
-  //while (heading >= -90 && right_value > 5) { 
-  //  updateMpu(); 
-  int i;  
-  //  right_value -= 1;          // 2. Decrementing turns the servo the opposite way
-  for (i=1; i<=81; i++) {
-    servo.write(right_value);
-    right_value -= 1;
-    delay(10);
-  }
-  //}
-  // Cleanup code
-  actuator.write(20);  
-  actuator2.write(20); 
-  delay(300);
-  servo.write(90);      // Snap back to straight center
-  delay(300);
-}
+void test_left()  { turnSteering(30,  +1, 85); }  // 30 -> 114
+void test_right() { turnSteering(150, -1, 81); } // 150 -> 70

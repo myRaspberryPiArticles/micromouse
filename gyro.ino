@@ -1,19 +1,22 @@
-// Gemini MPU6500/9250 module
-// `initMpu()` sets up the pins and I2C
-// Use `updateMpu()` in an interrupt or core 2
-// Value is updated to float `heading`
+// ============================================================
+//  MPU6500/9250 gyroscope (FastIMU library)
+//    initMpu()      — set up I2C + the chip
+//    resetHeading() — average the resting bias, zero `heading`
+//    updateMpu()    — integrate one step (call from a fast loop)
+//    heading        — current yaw in degrees (zeroed by resetHeading)
+//    globalHeading  — same integration but never reset (debug)
+// ============================================================
 
 #include <Wire.h>
-#include "FastIMU.h" 
+#include "FastIMU.h"
 
-// FIXED: Removed the ampersand '&' to pass by reference
-MPU6500 mpu(Wire1); 
+MPU6500 mpu(Wire1);
 
 float gyroBiasZ = 0.0;
 unsigned long lastTime = 0;
 
-float pitch = 0.0; // The filter works best on Pitch/Roll
-const float alpha = 0.98; // Filter coefficient (98% gyro, 2% accelerometer)
+// Rotation rates smaller than this are treated as noise (prevents drift).
+const float GYRO_NOISE_THRESHOLD = 1.855;
 
 void initMpu() {
   Wire1.setSDA(6);
@@ -28,29 +31,28 @@ void initMpu() {
     while (1) delay(10);
   }
 
-  mpu.setGyroRange(500); // 500 DPS
-  
-  // FIXED: Changed to the correct FastIMU method name
-  mpu.setGyroLPF(3); 
-  
+  mpu.setGyroRange(500);  // ±500 DPS
+  mpu.setGyroLPF(3);
+
   Serial1.println("MPU INIT SUCCESSFUL!");
 }
 
+// Average 500 gyro readings to find the resting bias, then zero heading.
 void resetHeading() {
-  int samples = 500;
+  const int samples = 500;
   double sum = 0;
   GyroData gyroData;
 
   for (int i = 0; i < samples; i++) {
     mpu.update();
     mpu.getGyro(&gyroData);
-    sum += gyroData.gyroZ; 
+    sum += gyroData.gyroZ;
     delay(2);
   }
-  
+
   gyroBiasZ = sum / samples;
   heading = 0.0;
-  lastTime = micros(); 
+  lastTime = micros();
 }
 
 void resetHeadingVariable() {
@@ -63,26 +65,18 @@ void updateMpu() {
   mpu.getGyro(&gyroData);
 
   unsigned long now = micros();
-  if (lastTime == 0) lastTime = now; 
+  if (lastTime == 0) lastTime = now;
   float dt = (now - lastTime) / 1000000.0;
   lastTime = now;
 
-  // 1. Corrected to use your existing gyroBiasZ variable
-  float rateZ = gyroData.gyroZ - gyroBiasZ; 
-  
-  // 2. Strict noise deadband using fabsf() for floats
-  // If the rotation rate is tiny, force it to 0 so it doesn't accumulate drift
-  float noiseThreshold = 1.855; // Adjust this up to 0.8 if it still creeps when still
-  if (fabsf(rateZ) < noiseThreshold) {
+  // Remove the calibrated bias, then zero out tiny rates (noise deadband)
+  float rateZ = gyroData.gyroZ - gyroBiasZ;
+  if (fabsf(rateZ) < GYRO_NOISE_THRESHOLD) {
     rateZ = 0.0;
   }
-  
-  // 3. Integrate the cleaned rate into your heading
-  float delta = rateZ * dt;   
-  heading += delta;       
-  globalHeading += delta; 
-  
-  //Serial1.print("Heading: ");
-  //Serial1.print(heading);
-  //Serial1.println("º");
+
+  // Integrate the cleaned rate into both headings
+  float delta = rateZ * dt;
+  heading += delta;
+  globalHeading += delta;
 }

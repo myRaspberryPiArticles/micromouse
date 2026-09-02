@@ -1,31 +1,32 @@
-// Gemini Encoders
-// Step 1. `initEncoders();` which sets up the pins and attaches interrupts
-// The, use variables `leftEncoderValue` and `rightEncoderValue` to access
-// Use `printEncoders();` to output the values in format L R
-// Includes function `calculateDistancePulses(mm)` to calculate how many pulses to travel
-// and `calculateAnglePulses(deg)` for angle
-// and `pulsesToDistance(pulses)` to reverse this
-// and `resetEncoders()` to set both values to 0
+// ============================================================
+//  Wheel encoders — both edges of both channels feed one shared
+//  pulse counter, `encoderValue` (volatile long).
+//
+//    initEncoders()         — set up pins + interrupts
+//    one_cell_forward()     — drive a full cell
+//    first_sense_forward()  — drive to the sensing point (60% of a cell)
+//    second_sense_forward() — drive to the cell end (remaining 40%)
+//    backup()               — reverse kick, then drive forward again
+// ============================================================
 
 #define ENCODER_A 22
 #define ENCODER_B 5
 
-const uint32_t PULSES_PER_MM = 18230;
+const uint32_t PULSES_PER_CELL = 18250;                       // full cell
+const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
+const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
+const long BACKUP_PULSES           = 3169;                   // forward distance in backup()
 
 void initEncoders() {
-  // Set pin mode
   pinMode(ENCODER_A, INPUT_PULLUP);
   pinMode(ENCODER_B, INPUT_PULLUP);
 
   attachInterrupt(digitalPinToInterrupt(ENCODER_A), encoderISR_A, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_B), encoderISR_B, CHANGE);
-
 }
 
-//int encoderValue = 0;
-
+// A changed: A != B means we rolled one way, A == B the other.
 void encoderISR_A() {
-  // When A changes: if A != B, we moved Forward (++)
   if (digitalRead(ENCODER_A) != digitalRead(ENCODER_B)) {
     encoderValue--;
   } else {
@@ -33,8 +34,8 @@ void encoderISR_A() {
   }
 }
 
+// B changed: opposite phase relationship to A.
 void encoderISR_B() {
-  // When B changes: if A == B, we moved Forward (++)
   if (digitalRead(ENCODER_A) == digitalRead(ENCODER_B)) {
     encoderValue--;
   } else {
@@ -42,40 +43,28 @@ void encoderISR_B() {
   }
 }
 
-void one_cell_forward() {
+// Drive forward at full speed until `targetPulses` have been counted.
+void driveForward(long targetPulses) {
   encoderValue = 0;
-  while (encoderValue < PULSES_PER_MM) {
+  while (encoderValue < targetPulses) {
     setMotors(255);
-   // Serial1.println(encoderValue);
   }
 }
 
-void first_sense_forward() {
-  encoderValue = 0;
-  while (encoderValue < (PULSES_PER_MM*0.6)) {
-    setMotors(255);
-   // Serial1.println(encoderValue);
-  }
-}
+void one_cell_forward()     { driveForward(PULSES_PER_CELL); }
+void first_sense_forward()  { driveForward(PULSES_TO_SENSE_POINT); }
+void second_sense_forward() { driveForward(PULSES_FROM_SENSE_POINT); }
 
-void second_sense_forward() {
-  encoderValue = 0;
-  while (encoderValue < (PULSES_PER_MM*0.4)) {
-    setMotors(255);
-   // Serial1.println(encoderValue);
-  }
-}
-
+// Reverse pulse to break loose, then drive forward BACKUP_PULSES.
+// (Despite the name, the net motion is forward — kept exactly as-is.)
 void backup() {
-  encoderValue = 0;
   setMotors(-255);
   delay(100);
   encoderValue = 0;
   stop();
-  while (encoderValue < 3169) {
+
+  while (encoderValue < BACKUP_PULSES) {
     setMotors(255);
-   // Serial1.println(encoderValue);
   }
-  
   stop();
 }
