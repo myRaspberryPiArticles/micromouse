@@ -10,11 +10,8 @@ uint8_t leftSensorValueNEW = 0;
 uint8_t frontSensorValueNEW = 0;
 uint8_t rightSensorValueNEW = 0;
   
-//uint8_t turn_counts = 0;
-
 void runFinal() {
-  // go half a cell forward
-  half_cell_forward();
+  first_sense_forward();
 
   // stop at the sensing point & take the value of left
   stop();
@@ -22,7 +19,7 @@ void runFinal() {
   int leftSensorValueNEW = leftSensorValue;
   int rightSensorValueNEW = rightSensorValue;
 
-  half_cell_forward(); // go to middle of next cell
+  second_sense_forward(); 
   
   // if gap on left and wall on right then turn left with a backup
   if ((leftSensorValueNEW < LEFT_THRESHOLD) && (rightSensorValueNEW > RIGHT_THRESHOLD)) {
@@ -39,17 +36,17 @@ void runFinal() {
     delay(200);
     printSensors();
   }
-  
+
+  Serial1.print("LEFT SENSOR IS AT ");
+  Serial1.print(leftSensorValue);
+  Serial1.print(" , threshold is ??, descision: ");
+  bool hmm = leftSensorValue < LEFT_THRESHOLD;
+  Serial1.print(hmm);
+  Serial1.println();
+
   // check if the value at the snesing point says there's a gap
   if ((leftSensorValueNEW < LEFT_THRESHOLD) && (rightSensorValueNEW < RIGHT_THRESHOLD)) {
     // gap on left, so turn left
-    Serial1.print("LEFT SENSOR IS AT ");
-    Serial1.print(leftSensorValue);
-    Serial1.print(" , threshold is ??, descision: ");
-    bool hmm = leftSensorValue < LEFT_THRESHOLD;
-    Serial1.print(hmm);
-    Serial1.println();
-  
     Serial1.println("gap on left");
     stop();
     delay(100);

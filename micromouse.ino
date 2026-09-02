@@ -36,11 +36,16 @@ const int BUTTON_3_PIN = 8;
 #define DEBUG_MINIMAL 1
 #define DEBUG_FULL 2
 
+// Motor Pins
+#define M_FORWARD   16
+#define M_BACKWARD   17
+#define SLP    20
+
+
 // Positioning variables
 int robotX = 0;
 int robotY = 0;
 int robotDir = 0;
-
 
 int mode; // 0 unconfigured 1 print sensors 2 test distance 3 test angle 4 wall follow 5 hardcoded 6 test MPU 7 solve maze
 
@@ -78,8 +83,8 @@ void loop() {
     //updateMpu();
     //buttons();
     //one_cell_forward();
-    //runFinal();
-    backup();
+    runFinal();
+    //backup();
 };
 
 // -- SECOND CORE (USED FOR SENSORS & MPU) --
