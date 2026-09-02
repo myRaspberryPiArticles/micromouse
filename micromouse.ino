@@ -5,9 +5,9 @@
 // ============================================================
 
 // --- Wall-detection thresholds (raw sensor ranges: see sensors.ino) ---
-const uint8_t LEFT_THRESHOLD  = 75;
+const uint8_t LEFT_THRESHOLD  = 100;
 const uint8_t FRONT_THRESHOLD = 11;
-const uint8_t RIGHT_THRESHOLD = 75;
+const uint8_t RIGHT_THRESHOLD = 100;
 
 // --- Live sensor readings (updated on core 1 by updateSensors()) ---
 volatile int leftSensorValue  = 0;
@@ -18,7 +18,7 @@ volatile int rightSensorValue = 0;
 volatile long encoderValue = 0;
 
 // --- Gyro headings (updated by updateMpu() in gyro.ino) ---
-volatile float heading        = 0.0; // re-zeroed for each turn
+volatile float heading       = 0.0; // re-zeroed for each turn
 volatile float globalHeading = 0.0; // never reset (debugging only)
 
 // --- Button pins (used by buttons.ino) ---
@@ -26,36 +26,43 @@ const int BUTTON_PIN   = 21;
 const int BUTTON_2_PIN = 10;
 const int BUTTON_3_PIN = 8;
 
+uint8_t mode = 0;
+
 void setup() {
   Serial1.begin(9600);
+  
   initButtons();
-
-  Serial1.println("starting initMpu");
   initMpu();
-  Serial1.println("initMpu is done!");
   resetHeading();
-
   setup_servo();
   initMotors();
   initEncoders();
 
   delay(2000);
 
-  Serial1.println("------mouse 2026.5.1------");
+  Serial1.println("------micromouse------");
   Serial1.println();
+  
+  while (mode == 0) {
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      mode = 1; // button 1
+    }
+    else if (digitalRead(BUTTON_2_PIN) == LOW) {
+      mode = 2; // button 2
+    }
+    else if (digitalRead(BUTTON_3_PIN) == LOW) {
+      mode = 3; // button 3
+    }
+    
+  }
+
+  
 }
 
 void loop() {
-  //printSensors();
-  //test_left();
-  //test_right();
-  //setMotors(255);
-  //Serial1.println(encoderValue);
-  //updateMpu();
-  //buttons();
-  //one_cell_forward();
-  runFinal();
-  //backup();
+  if (mode == 1) { printSensors(); buttons(); }
+  else if (mode == 2) { runFinal(); }
+  else if (mode == 3) { backup(); }
 }
 
 // --- Core 1: sensors & MPU ---

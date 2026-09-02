@@ -17,9 +17,9 @@
 #define E_FRONT      14
 
 // Phototransistors
-#define S_LEFT  28
+#define S_LEFT  26
 #define S_FRONT 27
-#define S_RIGHT 26
+#define S_RIGHT 28
 
 const uint8_t SETTLING_US = 75;  // wait after switching emitters on/off
 
@@ -57,10 +57,10 @@ void updateSensors() {
 }
 
 void printSensors() {
-  Serial1.print(rightSensorValue);
+  Serial1.print(leftSensorValue);
   Serial1.print(" ");
   Serial1.print(frontSensorValue);
   Serial1.print(" ");
-  Serial1.print(leftSensorValue);
+  Serial1.print(rightSensorValue);
   Serial1.println();
 }

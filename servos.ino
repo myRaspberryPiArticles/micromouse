@@ -1,8 +1,8 @@
 // ============================================================
 //  Steering servo + two actuators
 //    setup_servo() — attach everything and park at home
-//    test_left()   — fire actuators, sweep steering left, reset
-//    test_right()  — fire actuators, sweep steering right, reset
+//    turn_left()   — fire actuators, sweep steering left, reset
+//    turn_right()  — fire actuators, sweep steering right, reset
 // ============================================================
 
 #include <Servo.h>
@@ -20,12 +20,13 @@ void setup_servo() {
   actuator2.attach(3);
   servo.attach(2, 500, 2500);
 
+  // set to home positions
   actuator.write(ACTUATOR_HOME);
   actuator2.write(ACTUATOR_HOME);
   servo.write(STEERING_HOME);
 }
 
-// Point at `startValue`, fire the actuators, sweep the steering servo
+// Set the servo to `startValue`, fire the actuators, sweep the steering servo
 // `steps` times by `step` per move (10 ms per move), then reset.
 void turnSteering(int startValue, int step, int steps) {
   servo.write(startValue);
@@ -45,9 +46,10 @@ void turnSteering(int startValue, int step, int steps) {
   actuator.write(ACTUATOR_HOME);
   actuator2.write(ACTUATOR_HOME);
   delay(300);
+  
   servo.write(STEERING_HOME);
   delay(300);
 }
 
-void test_left()  { turnSteering(30,  +1, 85); }  // 30 -> 114
-void test_right() { turnSteering(150, -1, 81); } // 150 -> 70
+void turn_left()  { turnSteering(30,  +1, 85); }  // 30 -> 114
+void turn_right() { turnSteering(150, -1, 81); } // 150 -> 70

@@ -1,21 +1,22 @@
 // ============================================================
 //  Wheel encoders — both edges of both channels feed one shared
 //  pulse counter, `encoderValue` (volatile long).
+//  Forward motion counts UP; reverse motion counts DOWN.
 //
 //    initEncoders()         — set up pins + interrupts
 //    one_cell_forward()     — drive a full cell
 //    first_sense_forward()  — drive to the sensing point (60% of a cell)
 //    second_sense_forward() — drive to the cell end (remaining 40%)
-//    backup()               — reverse kick, then drive forward again
+//    backup()               — drive BACKUP_PULSES backwards
 // ============================================================
 
 #define ENCODER_A 22
 #define ENCODER_B 5
 
-const uint32_t PULSES_PER_CELL = 18250;                       // full cell
+const uint32_t PULSES_PER_CELL = 18230;                      // full cell
 const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
 const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
-const long BACKUP_PULSES           = 3169;                   // forward distance in backup()
+const long BACKUP_PULSES           = 3169;                   // backup distance
 
 void initEncoders() {
   pinMode(ENCODER_A, INPUT_PULLUP);
@@ -43,28 +44,30 @@ void encoderISR_B() {
   }
 }
 
-// Drive forward at full speed until `targetPulses` have been counted.
-void driveForward(long targetPulses) {
+// Drive until the encoder has counted `pulses` pulses.
+// Positive = forward (counter climbs), negative = backward (counter falls).
+void drivePulses(long pulses) {
   encoderValue = 0;
-  while (encoderValue < targetPulses) {
-    setMotors(255);
+
+  if (pulses >= 0) {
+    while (encoderValue < pulses) {
+      setMotors(255);
+    }
+    stop();
+  } else {
+    while (encoderValue > pulses) {
+      setMotors(-255);
+    }
+    stop();
   }
 }
 
-void one_cell_forward()     { driveForward(PULSES_PER_CELL); }
-void first_sense_forward()  { driveForward(PULSES_TO_SENSE_POINT); }
-void second_sense_forward() { driveForward(PULSES_FROM_SENSE_POINT); }
+void one_cell_forward()     { drivePulses(PULSES_PER_CELL); } // unchanged target
+void first_sense_forward()  { drivePulses(PULSES_TO_SENSE_POINT); }
+void second_sense_forward() { drivePulses(PULSES_FROM_SENSE_POINT); }
 
-// Reverse pulse to break loose, then drive forward BACKUP_PULSES.
-// (Despite the name, the net motion is forward — kept exactly as-is.)
+// Drive backwards BACKUP_PULSES, then stop.
 void backup() {
-  setMotors(-255);
-  delay(100);
-  encoderValue = 0;
-  stop();
-
-  while (encoderValue < BACKUP_PULSES) {
-    setMotors(255);
-  }
+  drivePulses(-BACKUP_PULSES);
   stop();
 }

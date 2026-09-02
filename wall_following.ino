@@ -1,77 +1,58 @@
-// ============================================================
-//  Wall-following run logic (called from loop())
-//    runFinal() — drive one cell at a time, deciding at the sensing
-//    point whether to turn left, turn right, or keep going.
-//  Thresholds (LEFT_/FRONT_/RIGHT_THRESHOLD) and the live sensor
-//  values are defined in the main sketch.
-// ============================================================
+bool left_then_forward = false;
 
 void runFinal() {
-  first_sense_forward();  // drive to the sensing point
-
-  // Stop at the sensing point and snapshot the side sensor values
-  stop();
-  delay(100);
-  int leftAtSensePoint  = leftSensorValue;
-  int rightAtSensePoint = rightSensorValue;
-
-  second_sense_forward();
-
-  // Gap on left AND wall on right -> turn left (with a backup)
-  if ((leftAtSensePoint < LEFT_THRESHOLD) && (rightAtSensePoint > RIGHT_THRESHOLD)) {
-    Serial1.println("gap on left");
-    stop();
-    delay(100);
-
-    test_left();
+  Serial1.println("new loop iteration c:");  
+  printSensors();
+  
+  // If wall on right and gap on left 
+  if ((leftSensorValue < LEFT_THRESHOLD) && (rightSensorValue > RIGHT_THRESHOLD)) {
+    Serial1.println("left turn (with backup)");
+    
+    turn_left();
+    
     delay(200);
-    //backup
-    delay(200);
+    
+    //backup();
+    //delay(200);
+    
     one_cell_forward();
-    delay(200);
-    printSensors();
+    left_then_forward = true;
   }
-
-  Serial1.print("LEFT SENSOR IS AT ");
-  Serial1.print(leftSensorValue);
-  Serial1.print(" , threshold is ??, descision: ");
-  Serial1.print(leftSensorValue < LEFT_THRESHOLD);
-  Serial1.println();
-
-  // Gap on left and open on the right -> turn left
-  if ((leftAtSensePoint < LEFT_THRESHOLD) && (rightAtSensePoint < RIGHT_THRESHOLD)) {
-    Serial1.println("gap on left");
-    stop();
-    delay(100);
-
-    test_left();
+  
+  // If gap on left and gap on right
+  else if ((leftSensorValue < LEFT_THRESHOLD) && (rightSensorValue < RIGHT_THRESHOLD)) {
+    Serial1.println("left turn (without backup)");
+    
+    turn_left();
+    
     delay(200);
+        
     one_cell_forward();
-    delay(200);
-    printSensors();
+    left_then_forward = true;
   }
+  
+  // If wall in front
   else if (frontSensorValue >= FRONT_THRESHOLD) {
-    // Wall in front -> turn right
-    delay(200);
-    stop();
-    delay(200);
-
-    printSensors();
-    Serial1.println("wall in front");
-    test_right();
-    delay(200);
-    //backup
-    printSensors();
+    Serial1.println("right turn");
+    turn_right();
+    //backup();
   }
+
   else {
-    // Path clear ahead -> continue forward
-    Serial1.println("going forward");
-    one_cell_forward();
-    delay(200);
-    printSensors();
+    if (left_then_forward == true) {
+      Serial1.println("already went forward");
+      left_then_forward = false;
+    }
+
+    else {
+      // Go forward
+      one_cell_forward();
+      Serial1.println("One cell forward");
+      left_then_forward = false;
+    }
   }
 
-  delay(200);
-  stop();
-  delay(200);
-}
+  delay(500);
+
+ }
+  
