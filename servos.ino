@@ -1,55 +1,43 @@
 // ============================================================
-//  Steering servo + two actuators
-//    setup_servo() — attach everything and park at home
-//    turn_left()   — fire actuators, sweep steering left, reset
-//    turn_right()  — fire actuators, sweep steering right, reset
+//  Steering Servo Control
+//    setup_servo() — attach steering servo and park at home
+//    turn_left()   — sweep steering left, reset
+//    turn_right()  — sweep steering right, reset
 // ============================================================
 
 #include <Servo.h>
 
-Servo actuator;   // GPIO 4
-Servo actuator2;  // GPIO 3
-Servo servo;      // GPIO 2 (J5 — standard servo)
+Servo servo; // GPIO 2 (J5 — standard servo)
 
-const int ACTUATOR_HOME = 20;
-const int ACTUATOR_FIRE = 190;  // deliberately past the usual 180 limit
-const int STEERING_HOME = 90;
+const int STEERING_HOME = 90; // Zero position for Steering Servo (GPIO 2)
 
 void setup_servo() {
-  actuator.attach(4);
-  actuator2.attach(3);
   servo.attach(2, 500, 2500);
-
-  // set to home positions
-  actuator.write(ACTUATOR_HOME);
-  actuator2.write(ACTUATOR_HOME);
   servo.write(STEERING_HOME);
+  delay(300); // Allow physical movement to settle
 }
 
-// Set the servo to `startValue`, fire the actuators, sweep the steering servo
-// `steps` times by `step` per move (10 ms per move), then reset.
+// Set steering to startValue, sweep steering, then reset to home position
 void turnSteering(int startValue, int step, int steps) {
   servo.write(startValue);
-  delay(500);
+  delay(200);
 
-  actuator.write(ACTUATOR_FIRE);
-  actuator2.write(ACTUATOR_FIRE);
-  delay(500);
+  actuatorDrivePulses(-26000);
+  delay(100);
 
   int value = startValue;
   for (int i = 0; i < steps; i++) {
     servo.write(value);
     value += step;
-    delay(10);
+    delay(5);
   }
 
-  actuator.write(ACTUATOR_HOME);
-  actuator2.write(ACTUATOR_HOME);
-  delay(300);
+  actuatorDrivePulses(26000);  
+  delay(100);
   
   servo.write(STEERING_HOME);
-  delay(300);
+  delay(100);
 }
 
-void turn_left()  { turnSteering(30,  +1, 85); }  // 30 -> 114
-void turn_right() { turnSteering(150, -1, 81); } // 150 -> 70
+void turn_left()  { turnSteering(30,  +1, 87); } // 30 -> 117
+void turn_right() { turnSteering(150, -1, 85); } // 150 -> 65

@@ -10,10 +10,9 @@ void runFinal() {
     
     turn_left();
     
-    delay(200);
+    delay(100);
     
-    //backup();
-    //delay(200);
+    backup();
     
     one_cell_forward();
     left_then_forward = true;
@@ -25,7 +24,7 @@ void runFinal() {
     
     turn_left();
     
-    delay(200);
+    delay(100);
         
     one_cell_forward();
     left_then_forward = true;
@@ -35,7 +34,10 @@ void runFinal() {
   else if (frontSensorValue >= FRONT_THRESHOLD) {
     Serial1.println("right turn");
     turn_right();
-    //backup();
+    
+    delay(100);
+    
+    backup();
   }
 
   else {
@@ -52,7 +54,7 @@ void runFinal() {
     }
   }
 
-  delay(500);
+  delay(50);
 
  }
   

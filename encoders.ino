@@ -13,15 +13,22 @@
 #define ENCODER_A 22
 #define ENCODER_B 5
 
-const uint32_t PULSES_PER_CELL = 18230;                      // full cell
+#define ACTUATOR_ENCODER_A 3
+#define ACTUATOR_ENCODER_B 4
+
+const uint32_t PULSES_PER_CELL = 4500;                       // full cell
 const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
 const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
-const long BACKUP_PULSES           = 3169;                   // backup distance
+const long BACKUP_PULSES           = 0;         // backup distance
 
 void initEncoders() {
   pinMode(ENCODER_A, INPUT_PULLUP);
   pinMode(ENCODER_B, INPUT_PULLUP);
+  pinMode(ACTUATOR_ENCODER_A, INPUT_PULLUP);
+  pinMode(ACTUATOR_ENCODER_B, INPUT_PULLUP);
 
+  attachInterrupt(digitalPinToInterrupt(ACTUATOR_ENCODER_A), actuatorISR_A, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ACTUATOR_ENCODER_B), actuatorISR_B, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_A), encoderISR_A, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_B), encoderISR_B, CHANGE);
 }
@@ -44,6 +51,24 @@ void encoderISR_B() {
   }
 }
 
+// --- ACTUATOR ---
+void actuatorISR_A() {
+  if (digitalRead(ACTUATOR_ENCODER_A) != digitalRead(ACTUATOR_ENCODER_B)) {
+    actuatorValue++;
+  } else {
+    actuatorValue--;
+  }
+}
+
+void actuatorISR_B() {
+  if (digitalRead(ACTUATOR_ENCODER_A) == digitalRead(ACTUATOR_ENCODER_B)) {
+    actuatorValue++;
+  } else {
+    actuatorValue--;
+  }
+}
+
+
 // Drive until the encoder has counted `pulses` pulses.
 // Positive = forward (counter climbs), negative = backward (counter falls).
 void drivePulses(long pulses) {
@@ -62,12 +87,31 @@ void drivePulses(long pulses) {
   }
 }
 
+void actuatorDrivePulses(long actuator_pulses) {
+  actuatorValue = 0;
+
+  if (actuator_pulses >= 0) {
+    while (actuatorValue < actuator_pulses) {
+      setActuator(255);
+    }
+    actuator_stop(); // FIXED: Changed from stop() to actuator_stop()
+  } else {
+    while (actuatorValue > actuator_pulses) {
+      setActuator(-255);
+    }
+    actuator_stop();
+  }
+}
+
 void one_cell_forward()     { drivePulses(PULSES_PER_CELL); } // unchanged target
 void first_sense_forward()  { drivePulses(PULSES_TO_SENSE_POINT); }
 void second_sense_forward() { drivePulses(PULSES_FROM_SENSE_POINT); }
 
 // Drive backwards BACKUP_PULSES, then stop.
 void backup() {
-  drivePulses(-BACKUP_PULSES);
+  drivePulses(-1000);
   stop();
+  delay(100);
+  drivePulses(BACKUP_PULSES);
+  delay(100);
 }

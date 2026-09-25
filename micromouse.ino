@@ -5,8 +5,8 @@
 // ============================================================
 
 // --- Wall-detection thresholds (raw sensor ranges: see sensors.ino) ---
-const uint8_t LEFT_THRESHOLD  = 100;
-const uint8_t FRONT_THRESHOLD = 11;
+const uint8_t LEFT_THRESHOLD  = 70;
+const uint8_t FRONT_THRESHOLD = 80;
 const uint8_t RIGHT_THRESHOLD = 100;
 
 // --- Live sensor readings (updated on core 1 by updateSensors()) ---
@@ -16,6 +16,7 @@ volatile int rightSensorValue = 0;
 
 // --- Wheel encoder pulse count (updated by ISRs in encoders.ino) ---
 volatile long encoderValue = 0;
+volatile long actuatorValue = 0;
 
 // --- Gyro headings (updated by updateMpu() in gyro.ino) ---
 volatile float heading       = 0.0; // re-zeroed for each turn
@@ -42,7 +43,8 @@ void setup() {
 
   Serial1.println("------micromouse------");
   Serial1.println();
-  
+
+
   while (mode == 0) {
     if (digitalRead(BUTTON_PIN) == LOW) {
       mode = 1; // button 1
