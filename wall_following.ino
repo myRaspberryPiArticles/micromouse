@@ -1,8 +1,16 @@
 bool left_then_forward = false;
 
 void runFinal() {
-  Serial1.println("new loop iteration c:");  
+  Serial1.println("new loop iteration");  
   printSensors();
+
+  // Reverse if too close to front wall
+  if (frontSensorValue >= 170) {
+    delay(100);
+    Serial1.println("too close to wall");  
+    drivePulses(-700);
+    delay(100);
+  }
   
   // If wall on right and gap on left 
   if ((leftSensorValue < LEFT_THRESHOLD) && (rightSensorValue > RIGHT_THRESHOLD)) {
@@ -57,4 +65,3 @@ void runFinal() {
   delay(50);
 
  }
-  

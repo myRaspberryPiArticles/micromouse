@@ -16,10 +16,10 @@
 #define ACTUATOR_ENCODER_A 3
 #define ACTUATOR_ENCODER_B 4
 
-const uint32_t PULSES_PER_CELL = 4500;                       // full cell
+const uint32_t PULSES_PER_CELL     = 5151;                   // full cell
 const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
 const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
-const long BACKUP_PULSES           = 0;         // backup distance
+const long BACKUP_PULSES           = 388;                    // backup distance
 
 void initEncoders() {
   pinMode(ENCODER_A, INPUT_PULLUP);
@@ -73,15 +73,27 @@ void actuatorISR_B() {
 // Positive = forward (counter climbs), negative = backward (counter falls).
 void drivePulses(long pulses) {
   encoderValue = 0;
+  unsigned long startTime = millis();
+  const unsigned long TIMEOUT_MS = 5000; // 5-second safety timeout for wheels
 
   if (pulses >= 0) {
     while (encoderValue < pulses) {
       setMotors(255);
+      
+      // Safety escape if wheels are stuck or slipping
+      if (millis() - startTime > TIMEOUT_MS) {
+        break; 
+      }
     }
     stop();
   } else {
     while (encoderValue > pulses) {
       setMotors(-255);
+      
+      // Safety escape if wheels are stuck or slipping
+      if (millis() - startTime > TIMEOUT_MS) {
+        break; 
+      }
     }
     stop();
   }
@@ -89,15 +101,27 @@ void drivePulses(long pulses) {
 
 void actuatorDrivePulses(long actuator_pulses) {
   actuatorValue = 0;
+  unsigned long startTime = millis();
+  const unsigned long TIMEOUT_MS = 6000; // 3-second safety timeout
 
   if (actuator_pulses >= 0) {
     while (actuatorValue < actuator_pulses) {
       setActuator(255);
+      
+      // Safety escape if it hits a physical end-stop or stalls
+      if (millis() - startTime > TIMEOUT_MS) {
+        break;
+      }
     }
-    actuator_stop(); // FIXED: Changed from stop() to actuator_stop()
+    actuator_stop();
   } else {
     while (actuatorValue > actuator_pulses) {
       setActuator(-255);
+      
+      // Safety escape if it hits a physical end-stop or stalls
+      if (millis() - startTime > TIMEOUT_MS) {
+        break;
+      }
     }
     actuator_stop();
   }
@@ -109,9 +133,9 @@ void second_sense_forward() { drivePulses(PULSES_FROM_SENSE_POINT); }
 
 // Drive backwards BACKUP_PULSES, then stop.
 void backup() {
-  drivePulses(-1000);
+  drivePulses(-1500);
   stop();
-  delay(100);
+  delay(200);
   drivePulses(BACKUP_PULSES);
   delay(100);
 }

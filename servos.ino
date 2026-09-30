@@ -22,7 +22,7 @@ void turnSteering(int startValue, int step, int steps) {
   servo.write(startValue);
   delay(200);
 
-  actuatorDrivePulses(-26000);
+  actuatorDrivePulses(-15000);
   delay(100);
 
   int value = startValue;
@@ -32,12 +32,12 @@ void turnSteering(int startValue, int step, int steps) {
     delay(5);
   }
 
-  actuatorDrivePulses(26000);  
+  actuatorDrivePulses(15000);  
   delay(100);
   
   servo.write(STEERING_HOME);
   delay(100);
 }
 
-void turn_left()  { turnSteering(30,  +1, 87); } // 30 -> 117
-void turn_right() { turnSteering(150, -1, 85); } // 150 -> 65
+void turn_left()  { turnSteering(30,  +1, 85); } // 30 -> 117
+void turn_right() { turnSteering(150, -1, 77); } // 150 -> 65

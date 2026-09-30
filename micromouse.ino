@@ -6,8 +6,8 @@
 
 // --- Wall-detection thresholds (raw sensor ranges: see sensors.ino) ---
 const uint8_t LEFT_THRESHOLD  = 70;
-const uint8_t FRONT_THRESHOLD = 80;
-const uint8_t RIGHT_THRESHOLD = 100;
+const uint8_t FRONT_THRESHOLD = 40;
+const uint8_t RIGHT_THRESHOLD = 80;
 
 // --- Live sensor readings (updated on core 1 by updateSensors()) ---
 volatile int leftSensorValue  = 0;
@@ -62,9 +62,9 @@ void setup() {
 }
 
 void loop() {
-  if (mode == 1) { printSensors(); buttons(); }
-  else if (mode == 2) { runFinal(); }
-  else if (mode == 3) { backup(); }
+  if (mode == 1) { printSensors(); buttons();   }
+  else if (mode == 2) { delay(200); runFinal(); }
+  else if (mode == 3) { delay(200); backup(); }
 }
 
 // --- Core 1: sensors & MPU ---
