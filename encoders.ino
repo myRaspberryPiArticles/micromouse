@@ -16,10 +16,10 @@
 #define ACTUATOR_ENCODER_A 3
 #define ACTUATOR_ENCODER_B 4
 
-const uint32_t PULSES_PER_CELL     = 5151;                   // full cell
+const uint32_t PULSES_PER_CELL     = 5140;                   // full cell
 const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
 const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
-const long BACKUP_PULSES           = 388;                    // backup distance
+const long BACKUP_PULSES = 388; // or 777 for double of 388  // 7292
 
 void initEncoders() {
   pinMode(ENCODER_A, INPUT_PULLUP);
@@ -133,9 +133,9 @@ void second_sense_forward() { drivePulses(PULSES_FROM_SENSE_POINT); }
 
 // Drive backwards BACKUP_PULSES, then stop.
 void backup() {
-  drivePulses(-1500);
+  setMotors(-255);
+  delay(1000);
   stop();
-  delay(200);
   drivePulses(BACKUP_PULSES);
-  delay(100);
+  delay(50);
 }

@@ -20,9 +20,9 @@ void setup_servo() {
 // Set steering to startValue, sweep steering, then reset to home position
 void turnSteering(int startValue, int step, int steps) {
   servo.write(startValue);
-  delay(200);
+  delay(50);
 
-  actuatorDrivePulses(-15000);
+  actuatorDrivePulses(-16000);
   delay(100);
 
   int value = startValue;
@@ -32,12 +32,12 @@ void turnSteering(int startValue, int step, int steps) {
     delay(5);
   }
 
-  actuatorDrivePulses(15000);  
+  actuatorDrivePulses(16010);  
   delay(100);
   
   servo.write(STEERING_HOME);
-  delay(100);
+  delay(50);
 }
 
-void turn_left()  { turnSteering(30,  +1, 85); } // 30 -> 117
-void turn_right() { turnSteering(150, -1, 77); } // 150 -> 65
+void turn_left()  { turnSteering(30,  +1, 75); } // 30 -> 117
+void turn_right() { turnSteering(150, -1, 79); } // 150 -> 65

@@ -6,10 +6,10 @@ void runFinal() {
 
   // Reverse if too close to front wall
   if (frontSensorValue >= 170) {
-    delay(100);
+    delay(50);
     Serial1.println("too close to wall");  
     drivePulses(-700);
-    delay(100);
+    delay(50);
   }
   
   // If wall on right and gap on left 
@@ -18,7 +18,7 @@ void runFinal() {
     
     turn_left();
     
-    delay(100);
+    delay(50);
     
     backup();
     
@@ -43,7 +43,7 @@ void runFinal() {
     Serial1.println("right turn");
     turn_right();
     
-    delay(100);
+    delay(50);
     
     backup();
   }
