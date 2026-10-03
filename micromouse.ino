@@ -5,9 +5,9 @@
 // ============================================================
 
 // --- Wall-detection thresholds (raw sensor ranges: see sensors.ino) ---
-const uint8_t LEFT_THRESHOLD  = 80;
-const uint8_t FRONT_THRESHOLD = 40;
-const uint8_t RIGHT_THRESHOLD = 80;
+const uint8_t LEFT_THRESHOLD  = 100;
+const uint8_t FRONT_THRESHOLD = 60;
+const uint8_t RIGHT_THRESHOLD = 100;
 
 // --- Live sensor readings (updated on core 1 by updateSensors()) ---
 volatile int leftSensorValue  = 0;

@@ -5,10 +5,11 @@ void runFinal() {
   printSensors();
 
   // Reverse if too close to front wall
-  if (frontSensorValue >= 170) {
+  if (frontSensorValue >= 325) {
     delay(50);
+    drivePulses(300);
     Serial1.println("too close to wall");  
-    drivePulses(-700);
+    drivePulses(-500);
     delay(50);
   }
   
