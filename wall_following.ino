@@ -22,8 +22,12 @@ void runFinal() {
     
     backup();
     
-    one_cell_forward();
-    left_then_forward = true;
+    if (frontSensorValue >= FRONT_THRESHOLD) { // wall in front
+        left_then_forward = false;
+    } else {
+        one_cell_forward();
+        left_then_forward = true;
+    }
   }
   
   // If gap on left and gap on right
@@ -33,9 +37,13 @@ void runFinal() {
     turn_left();
     
     delay(100);
-        
-    one_cell_forward();
-    left_then_forward = true;
+
+    if (frontSensorValue >= FRONT_THRESHOLD) { // wall in front
+        left_then_forward = false;
+    } else {
+        one_cell_forward();
+        left_then_forward = true;
+    }
   }
   
   // If wall in front
