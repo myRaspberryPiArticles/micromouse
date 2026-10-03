@@ -32,12 +32,12 @@ void turnSteering(int startValue, int step, int steps) {
     delay(5);
   }
 
-  actuatorDrivePulses(16010);  
+  actuatorDrivePulses(16000);  
   delay(100);
   
   servo.write(STEERING_HOME);
   delay(50);
 }
 
-void turn_left()  { turnSteering(30,  +1, 75); } // 30 -> 117
-void turn_right() { turnSteering(150, -1, 79); } // 150 -> 65
+void turn_left()  { turnSteering(30,  +1, 76); } // 30 -> 117
+void turn_right() { turnSteering(150, -1, 80); } // 150 -> 65

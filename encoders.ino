@@ -16,7 +16,7 @@
 #define ACTUATOR_ENCODER_A 3
 #define ACTUATOR_ENCODER_B 4
 
-const uint32_t PULSES_PER_CELL     = 5140;                   // full cell
+const uint32_t PULSES_PER_CELL     = 5125;                   // full cell
 const long PULSES_TO_SENSE_POINT   = PULSES_PER_CELL * 0.6;  // 10938
 const long PULSES_FROM_SENSE_POINT = PULSES_PER_CELL * 0.4;  // 7292
 const long BACKUP_PULSES = 388; // or 777 for double of 388  // 7292
